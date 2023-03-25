@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { css } from "styled-components/macro"; //eslint-disable-line
+import BeatLoader from "react-spinners/BeatLoader";
 import { SectionHeading, Subheading as SubheadingBase } from "components/misc/Headings.js";
 import { PrimaryButton as PrimaryButtonBase } from "components/misc/Buttons.js";
 import EmailIllustrationSrc from "images/email-illustration.svg";
@@ -35,11 +36,50 @@ export default ({
   heading = <>Feel free to <span tw="text-primary-500">get in touch</span><wbr/> with us.</>,
   description = "Want to get into contact with us, provide feedback or just send us a meme? Just send us a message and we'll get back to you as soon as possible.",
   submitButtonText = "Contact Us",
-  formAction = "#",
+  formAction = "https://1qr35x0md5.execute-api.us-west-2.amazonaws.com/dev/users/contact-me/",
   formMethod = "get",
   textOnLeft = true,
 }) => {
   // The textOnLeft boolean prop can be used to display either the text on left or right side of the image.
+  const [email, setEmail] = useState(""); 
+  const [submissionStatus, setSubmissionStatus] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    const url = `${formAction}${email}`; 
+    const response = await fetch(url); 
+    const data = await response.json();
+    
+    if (data.accepted && data.accepted.length > 0) {
+      setSubmissionStatus("success");
+    } else {
+      setSubmissionStatus("failure");
+    } 
+    setIsLoading(false);
+    //console.log(data);
+  }
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  }
+
+  const renderSubmissionMessage = () => {
+    if (submissionStatus === "success") {
+      return <p tw="text-green-500 mt-4">Your email has been sent successfully!</p>;
+    } else if (submissionStatus === "failure") {
+      return <p tw="text-red-500 mt-4">Failed to send your email. Please try again.</p>;
+    }
+  };
+
+  const renderLoader = () => {
+    return (
+      <div tw="mt-4">
+        <BeatLoader color={"#3182CE"} loading={isLoading} css={css`display: block; margin: 0 auto;`} />
+      </div>
+    );
+  };
 
   return (
     <Container>
@@ -52,10 +92,12 @@ export default ({
             {subheading && <Subheading>{subheading}</Subheading>}
             <Heading>{heading}</Heading>
             <Description>{description}</Description>
-            <Form action={formAction} method={formMethod}>
-              <Input type="email" name="email" placeholder="Your Email Address" />
+            <Form onSubmit={handleSubmit}>
+              <Input type="email" name="email" placeholder="Your Email Address" value={email} onChange={handleEmailChange} />
               <SubmitButton type="submit">{submitButtonText}</SubmitButton>
             </Form>
+            {isLoading && renderLoader()}
+            {renderSubmissionMessage()}
           </TextContent>
         </TextColumn>
       </TwoColumn>
