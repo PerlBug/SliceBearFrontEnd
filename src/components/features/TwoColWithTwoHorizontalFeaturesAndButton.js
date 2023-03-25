@@ -67,7 +67,7 @@ export default ({
     </>
   ),
   description = "SliceBear offers a seamless user experience, allowing you to quickly select the YouTube videos you want to slice and then automatically apply captions in a format you desire. Our cutting-edge technology does all the hard work, ensuring that your short videos are ready to go in no time. ",
-  primaryButtonText = "Learn More",
+  primaryButtonText = "Try it here!",
   primaryButtonUrl = "https://app.slicebear.com",
   imageSrc = TeamIllustrationSrc,
   buttonRounded = true,
